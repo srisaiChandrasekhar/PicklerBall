@@ -9,6 +9,7 @@ namespace Picklr.Models
         public DbSet<Club> Clubs { get; set; } = null!;
         public DbSet<PicklProgram> Programs { get; set; } = null!;
         public DbSet<AppUser> Users { get; set; } = null!;
+        public DbSet<Reservation> Reservations { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,28 +33,34 @@ namespace Picklr.Models
                 }
             );
 
-            // Seed Programs
+            // Seed Programs (with ClubID and AvailableDays)
             modelBuilder.Entity<PicklProgram>().HasData(
                 new PicklProgram
                 {
                     ProgramID = 1,
                     Name = "Beginner Open Play",
                     Description = "Drop-in open play for new players. No experience needed.",
-                    Fee = 10.00m
+                    Fee = 10.00m,
+                    ClubID = 1,
+                    AvailableDays = Weekdays.Monday | Weekdays.Wednesday | Weekdays.Friday
                 },
                 new PicklProgram
                 {
                     ProgramID = 2,
                     Name = "Intermediate Clinic",
                     Description = "Weekly skill-building clinic led by a certified coach.",
-                    Fee = 25.00m
+                    Fee = 25.00m,
+                    ClubID = 1,
+                    AvailableDays = Weekdays.Tuesday | Weekdays.Thursday
                 },
                 new PicklProgram
                 {
                     ProgramID = 3,
                     Name = "Advanced Tournament",
                     Description = "Competitive round-robin tournament for rated players.",
-                    Fee = 40.00m
+                    Fee = 40.00m,
+                    ClubID = 2,
+                    AvailableDays = Weekdays.Saturday | Weekdays.Sunday
                 }
             );
 

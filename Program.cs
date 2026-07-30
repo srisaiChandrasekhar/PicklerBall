@@ -4,6 +4,8 @@ using Picklr.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add MVC services
+builder.Services.AddMemoryCache();
+builder.Services.AddSession();
 builder.Services.AddControllersWithViews();
 
 // Add EF Core DI
@@ -22,6 +24,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 app.UseAuthorization();
 
 // Admin area route — must come BEFORE the default route

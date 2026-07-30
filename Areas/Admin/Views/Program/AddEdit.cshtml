@@ -1,6 +1,12 @@
 @model PicklProgram
 @{
     ViewData["Title"] = ViewBag.Action + " Program";
+
+    var weekdays = new[]
+    {
+        Weekdays.Monday, Weekdays.Tuesday, Weekdays.Wednesday,
+        Weekdays.Thursday, Weekdays.Friday, Weekdays.Saturday, Weekdays.Sunday
+    };
 }
 
 <h2 class="mt-3">@ViewBag.Action Program</h2>
@@ -30,6 +36,35 @@
         <span asp-validation-for="Fee" class="text-danger"></span>
     </div>
 
+    <div class="mb-3">
+        <label asp-for="ClubID" class="form-label">Club</label>
+        <select asp-for="ClubID" asp-items="ViewBag.Clubs" class="form-select">
+            <option value="">-- Select Club --</option>
+        </select>
+        <span asp-validation-for="ClubID" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Available Days</label>
+        <div class="d-flex flex-wrap gap-3">
+            @foreach (var day in weekdays)
+            {
+                bool isChecked = Model.AvailableDays.HasFlag(day);
+                <div class="form-check">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           name="selectedDays"
+                           value="@((int)day)"
+                           id="day_@day"
+                           @(isChecked ? "checked" : "") />
+                    <label class="form-check-label" for="day_@day">@day</label>
+                </div>
+            }
+        </div>
+        @* Hidden field carries the combined bit-flag value to the POST action *@
+        <input type="hidden" asp-for="AvailableDays" id="availableDaysHidden" />
+    </div>
+
     <button type="submit" class="btn btn-primary">@ViewBag.Action</button>
     <a asp-action="List" class="btn btn-secondary ms-2">Cancel</a>
 </form>
@@ -37,4 +72,14 @@
 @section scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        // Combine checked day values into the hidden AvailableDays field before submit
+        document.querySelector('form').addEventListener('submit', function () {
+            let total = 0;
+            document.querySelectorAll('input[name="selectedDays"]:checked').forEach(function (cb) {
+                total += parseInt(cb.value);
+            });
+            document.getElementById('availableDaysHidden').value = total;
+        });
+    </script>
 }

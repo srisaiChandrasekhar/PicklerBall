@@ -1,0 +1,55 @@
+@model List<CartItem>
+@{
+    ViewData["Title"] = "My Cart";
+}
+
+<h2 class="mt-3">My Cart</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Your cart is empty. <a asp-controller="Home" asp-action="Index">Browse programs</a>.</div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Program</th>
+                <th>Club</th>
+                <th>Date</th>
+                <th>Fee</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ProgramName</td>
+                    <td>@item.ClubName</td>
+                    <td>@item.ReservationDate.ToString("MM/dd/yyyy")</td>
+                    <td>@item.Fee.ToString("C")</td>
+                    <td>
+                        <a asp-action="Cancel" asp-route-id="@item.ProgramID"
+                           class="btn btn-sm btn-outline-danger">Remove</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="table-secondary fw-bold">
+                <td colspan="3" class="text-end">Total</td>
+                <td>@Model.Sum(i => i.Fee).ToString("C")</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="d-flex gap-2 mt-2">
+        <form asp-action="Pay" method="post">
+            <button type="submit" class="btn btn-success">Pay &amp; Confirm</button>
+        </form>
+        <a asp-action="ClearAll" class="btn btn-outline-danger">Clear All</a>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Continue Browsing</a>
+    </div>
+}

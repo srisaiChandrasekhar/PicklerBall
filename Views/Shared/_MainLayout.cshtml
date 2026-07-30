@@ -1,9 +1,12 @@
+@using Picklr.Models
 @{
     Layout = "_Layout";
 
     // Used to highlight the active nav link
     string ctrl = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     string act  = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    int cartCount = PicklrSession.GetCartCount(Context.Session);
 }
 
 <div class="container">
@@ -38,8 +41,21 @@
                            asp-area="" asp-controller="Home" asp-action="Shop">Shop</a>
                     </div>
 
-                    @* Right-side Admin link *@
-                    <div class="navbar-nav ms-auto">
+                    @* Right-side: cart icon + Admin link *@
+                    <div class="navbar-nav ms-auto align-items-center">
+                        @* Cart icon with badge *@
+                        <a class="nav-item nav-link position-relative me-2 @(ctrl == "Cart" ? "active" : "")"
+                           asp-controller="Cart" asp-action="Index" title="My Cart">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            @if (cartCount > 0)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle
+                                             badge rounded-pill bg-danger">
+                                    @cartCount
+                                </span>
+                            }
+                        </a>
+
                         <a class="nav-item nav-link"
                            asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a>
                     </div>
@@ -47,7 +63,6 @@
             </div>
         </nav>
 
-        @* TempData confirmation message (placeholder for future client-side operations) *@
         @if (TempData.Keys.Contains("message"))
         {
             <div class="alert alert-success mt-2 text-center">@TempData["message"]</div>

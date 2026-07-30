@@ -1,6 +1,8 @@
 @model List<PicklProgram>
 @{
     ViewData["Title"] = "Programs";
+
+    var weekdays = Enum.GetValues<Weekdays>().Where(d => d != Weekdays.None);
 }
 
 <h2 class="mt-3">Programs</h2>
@@ -11,7 +13,8 @@
     <thead class="table-dark">
         <tr>
             <th>Name</th>
-            <th>Description</th>
+            <th>Club</th>
+            <th>Available Days</th>
             <th>Fee</th>
             <th></th>
             <th></th>
@@ -20,9 +23,13 @@
     <tbody>
         @foreach (var program in Model)
         {
+            var days = weekdays
+                .Where(d => program.AvailableDays.HasFlag(d))
+                .Select(d => d.ToString());
             <tr>
                 <td>@program.Name</td>
-                <td>@program.Description</td>
+                <td>@(program.Club?.Name ?? "—")</td>
+                <td>@(days.Any() ? string.Join(", ", days) : "—")</td>
                 <td>@program.Fee.ToString("C")</td>
                 <td>
                     <a asp-action="AddEdit" asp-route-id="@program.ProgramID"

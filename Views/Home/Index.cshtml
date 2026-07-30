@@ -1,11 +1,98 @@
+@model HomeViewModel
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Find a Program";
+    string selectedDateStr = Model.Date?.ToString("yyyy-MM-dd") ?? "";
 }
 
-<div class="hero-section">
-    <div class="hero-overlay">
-        <h1 class="display-3 fw-bold">Welcome to Picklr</h1>
-        <p class="lead fs-4">Your online pickleball booking platform.</p>
-        <p>Use the navigation above to explore clubs, programs, and our shop.</p>
+<div class="row mt-4">
+
+    @* ── Left panel: filters ── *@
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header bg-success text-white fw-bold">Filter Programs</div>
+            <div class="card-body">
+                <form method="get" asp-action="Index">
+
+                    <div class="mb-3">
+                        <label asp-for="ClubId" class="form-label fw-semibold">Club</label>
+                        <select asp-for="ClubId" class="form-select">
+                            <option value="">All Clubs</option>
+                            @foreach (var club in Model.Clubs)
+                            {
+                                <option value="@club.ClubID">@club.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Date</label>
+                        <select name="Date" class="form-select">
+                            @foreach (var date in Model.AvailableDates)
+                            {
+                                string val   = date.ToString("yyyy-MM-dd");
+                                string label = date.Date == DateTime.Today
+                                               ? $"Today ({date:ddd, MMM d})"
+                                               : date.ToString("ddd, MMM d");
+                                if (val == selectedDateStr)
+                                {
+                                    <option value="@val" selected>@label</option>
+                                }
+                                else
+                                {
+                                    <option value="@val">@label</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Search</button>
+                    <a asp-action="Clear"
+                       class="btn btn-outline-secondary w-100 mt-2">Clear</a>
+                </form>
+            </div>
+        </div>
     </div>
+
+    @* ── Right panel: results ── *@
+    <div class="col-md-9">
+        <h2>Programs for @Model.Date?.ToString("dddd, MMMM d")</h2>
+
+        @if (!Model.Programs.Any())
+        {
+            <div class="alert alert-info">No programs are available on this date.</div>
+        }
+        else
+        {
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Program</th>
+                        <th>Club</th>
+                        <th>Fee</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.Programs)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@p.Name</strong><br />
+                                <small class="text-muted">@p.Description</small>
+                            </td>
+                            <td>@p.Club?.Name</td>
+                            <td>@p.Fee.ToString("C")</td>
+                            <td>
+                                <a asp-controller="Cart" asp-action="Reserve"
+                                   asp-route-id="@p.ProgramID"
+                                   asp-route-date="@selectedDateStr"
+                                   class="btn btn-sm btn-success">Reserve</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
 </div>

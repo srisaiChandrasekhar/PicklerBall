@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Picklr.Models;
 
 namespace Picklr.Areas.Admin.Controllers
@@ -6,7 +8,7 @@ namespace Picklr.Areas.Admin.Controllers
     [Area("Admin")]
     public class ProgramController : Controller
     {
-        private PicklrContext context;
+        private readonly PicklrContext context;
 
         public ProgramController(PicklrContext ctx)
         {
@@ -16,7 +18,10 @@ namespace Picklr.Areas.Admin.Controllers
         // GET /Admin/Program/List
         public IActionResult List()
         {
-            var programs = context.Programs.OrderBy(p => p.Name).ToList();
+            var programs = context.Programs
+                .Include(p => p.Club)
+                .OrderBy(p => p.Name)
+                .ToList();
             return View(programs);
         }
 
@@ -30,6 +35,9 @@ namespace Picklr.Areas.Admin.Controllers
                 : context.Programs.Find(id) ?? new PicklProgram();
 
             ViewBag.Action = (id == null) ? "Add" : "Edit";
+            ViewBag.Clubs = new SelectList(
+                context.Clubs.OrderBy(c => c.Name).ToList(),
+                "ClubID", "Name", program.ClubID);
             return View(program);
         }
 
@@ -49,6 +57,9 @@ namespace Picklr.Areas.Admin.Controllers
             }
 
             ViewBag.Action = (program.ProgramID == 0) ? "Add" : "Edit";
+            ViewBag.Clubs = new SelectList(
+                context.Clubs.OrderBy(c => c.Name).ToList(),
+                "ClubID", "Name", program.ClubID);
             return View(program);
         }
 

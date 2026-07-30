@@ -13,5 +13,8 @@ namespace Picklr.Models
         public string Location { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
+
+        // Navigation property
+        public List<PicklProgram> Programs { get; set; } = new();
     }
 }

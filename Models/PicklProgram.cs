@@ -16,5 +16,12 @@ namespace Picklr.Models
 
         [Range(0, 10000, ErrorMessage = "Fee must be between 0 and 10000.")]
         public decimal Fee { get; set; }
+
+        // FK to Club
+        public int ClubID { get; set; }
+        public Club? Club { get; set; }
+
+        // Bit-flag weekday availability
+        public Weekdays AvailableDays { get; set; }
     }
 }
