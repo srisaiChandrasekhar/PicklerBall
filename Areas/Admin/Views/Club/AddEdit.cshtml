@@ -1,14 +1,14 @@
-@model Club
+@model Picklr.Models.Club
+
 @{
-    ViewData["Title"] = ViewBag.Action + " Club";
+    ViewBag.Title = ViewBag.Action + " Club";
 }
 
-<h2 class="mt-3">@ViewBag.Action Club</h2>
+<h1>@ViewBag.Action Club</h1>
 
-<form asp-action="AddEdit" method="post" class="mt-3" style="max-width:600px;">
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+<form asp-action="AddEdit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    @* Hidden field preserves the ClubID so the POST can distinguish Add vs Edit *@
     <input type="hidden" asp-for="ClubID" />
 
     <div class="mb-3">
@@ -25,14 +25,14 @@
 
     <div class="mb-3">
         <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">@ViewBag.Action</button>
-    <a asp-action="List" class="btn btn-secondary ms-2">Cancel</a>
+    <a asp-action="List" class="btn btn-secondary">Cancel</a>
 </form>
 
-@section scripts {
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

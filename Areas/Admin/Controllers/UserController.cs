@@ -13,15 +13,15 @@ namespace Picklr.Areas.Admin.Controllers
             context = ctx;
         }
 
-        // GET /Admin/User/List
         public IActionResult List()
         {
-            var users = context.Users.OrderBy(u => u.LastName).ThenBy(u => u.FirstName).ToList();
+            var users = context.Users
+                .OrderBy(u => u.LastName)
+                .ThenBy(u => u.FirstName)
+                .ToList();
             return View(users);
         }
 
-        // GET /Admin/User/AddEdit        — blank form (Add)
-        // GET /Admin/User/AddEdit/1      — loads existing record (Edit)
         [HttpGet]
         public IActionResult AddEdit(int? id)
         {
@@ -45,7 +45,7 @@ namespace Picklr.Areas.Admin.Controllers
 
                 context.SaveChanges();
                 TempData["message"] = $"'{user.FullName}' was saved successfully.";
-                return RedirectToAction("List"); // PRG
+                return RedirectToAction("List");
             }
 
             ViewBag.Action = (user.UserID == 0) ? "Add" : "Edit";
@@ -65,7 +65,7 @@ namespace Picklr.Areas.Admin.Controllers
             context.Users.Remove(user);
             context.SaveChanges();
             TempData["message"] = $"'{user.FullName}' was deleted.";
-            return RedirectToAction("List"); // PRG
+            return RedirectToAction("List");
         }
     }
 }

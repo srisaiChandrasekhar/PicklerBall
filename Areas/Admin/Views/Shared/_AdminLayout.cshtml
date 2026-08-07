@@ -48,10 +48,14 @@
 
     <main>
         @RenderBody()
-        @RenderSection("scripts", required: false)
     </main>
 
     <footer class="mt-4 py-3 border-top text-center text-muted">
         <p>&copy; @DateTime.Now.Year Picklr Admin Portal</p>
     </footer>
 </div>
+
+@* Pass the child view's scripts up to _Layout so they load after jQuery *@
+@section scripts {
+    @await RenderSectionAsync("scripts", required: false)
+}

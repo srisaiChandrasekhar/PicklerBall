@@ -13,15 +13,12 @@ namespace Picklr.Areas.Admin.Controllers
             context = ctx;
         }
 
-        // GET /Admin/Club/List
         public IActionResult List()
         {
             var clubs = context.Clubs.OrderBy(c => c.Name).ToList();
             return View(clubs);
         }
 
-        // GET /Admin/Club/AddEdit        — shows a blank form (Add)
-        // GET /Admin/Club/AddEdit/3      — loads the Club with id=3 (Edit)
         [HttpGet]
         public IActionResult AddEdit(int? id)
         {
@@ -33,7 +30,6 @@ namespace Picklr.Areas.Admin.Controllers
             return View(club);
         }
 
-        // POST — handle both Add and Edit based on ClubID
         [HttpPost]
         public IActionResult AddEdit(Club club)
         {
@@ -46,15 +42,13 @@ namespace Picklr.Areas.Admin.Controllers
 
                 context.SaveChanges();
                 TempData["message"] = $"'{club.Name}' was saved successfully.";
-                return RedirectToAction("List"); // PRG: redirect after POST
+                return RedirectToAction("List");
             }
 
-            // Validation failed — redisplay the form
             ViewBag.Action = (club.ClubID == 0) ? "Add" : "Edit";
             return View(club);
         }
 
-        // GET /Admin/Club/Delete/3 — confirmation page
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -62,14 +56,13 @@ namespace Picklr.Areas.Admin.Controllers
             return View(club);
         }
 
-        // POST — perform the delete
         [HttpPost]
         public IActionResult Delete(Club club)
         {
             context.Clubs.Remove(club);
             context.SaveChanges();
             TempData["message"] = $"'{club.Name}' was deleted.";
-            return RedirectToAction("List"); // PRG
+            return RedirectToAction("List");
         }
     }
 }

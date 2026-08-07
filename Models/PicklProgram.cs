@@ -9,19 +9,32 @@ namespace Picklr.Models
         [Key]
         public int ProgramID { get; set; }
 
-        [Required(ErrorMessage = "Please enter a program name.")]
-        public string Name { get; set; } = string.Empty;
+       [Required(ErrorMessage = "Please enter a program name.")]
+       [StringLength(100, MinimumLength = 3,
+           ErrorMessage = "Program name must be between 3 and 100 characters.")]
+       [RegularExpression(@"^[A-Za-z0-9 '\-&.]+$",
+           ErrorMessage = "Program name can only contain letters, numbers, spaces, and basic punctuation.")]
+       [Display(Name = "Name")]
+       public string Name { get; set; } = string.Empty;
 
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
+        [Display(Name = "Description")]
         public string Description { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Please enter a fee.")]
         [Range(0, 10000, ErrorMessage = "Fee must be between 0 and 10000.")]
+        [Display(Name = "Fee")]
         public decimal Fee { get; set; }
 
         // FK to Club
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a club.")]
+        [Display(Name = "Club")]
         public int ClubID { get; set; }
+
         public Club? Club { get; set; }
 
         // Bit-flag weekday availability
+        [Display(Name = "Available Days")]
         public Weekdays AvailableDays { get; set; }
     }
 }

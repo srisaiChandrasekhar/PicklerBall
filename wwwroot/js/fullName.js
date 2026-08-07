@@ -1,21 +1,14 @@
 $.validator.addMethod("fullname", function (value, element) {
-    if (value == "") {
-        return true;
-    }
+    if (!value) return true;
 
-    var parts = value.trim().split(" ");
-    var count = 0;
+    var namePart = /^[A-Za-z]+(['\-][A-Za-z]+)*$/;
+    var parts = value.trim().split(/\s+/);
 
     for (var i = 0; i < parts.length; i++) {
-        if (parts[i] != "") {
-            count++;
-        }
+        if (!namePart.test(parts[i])) return false;
     }
 
-    return count >= 2;
+    return parts.length >= 2;
 });
 
-$.validator.unobtrusive.adapters.add("fullname", function (options) {
-    options.rules["fullname"] = true;
-    options.messages["fullname"] = options.message;
-});
+$.validator.unobtrusive.adapters.addBool("fullname");
