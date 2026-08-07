@@ -46,9 +46,7 @@ else
     </table>
 
     <div class="d-flex gap-2 mt-2">
-        <form asp-action="Pay" method="post">
-            <button type="submit" class="btn btn-success">Pay &amp; Confirm</button>
-        </form>
+        <a asp-action="Checkout" class="btn btn-success">Proceed to Checkout</a>
         <a asp-action="ClearAll" class="btn btn-outline-danger">Clear All</a>
         <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Continue Browsing</a>
     </div>

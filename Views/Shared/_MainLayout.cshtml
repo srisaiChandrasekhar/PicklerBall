@@ -71,10 +71,12 @@
 
     <main>
         @RenderBody()
-        @RenderSection("scripts", required: false)
     </main>
 
     <footer class="mt-4 py-3 border-top text-center text-muted">
         <p>&copy; @DateTime.Now.Year Picklr &mdash; All rights reserved.</p>
     </footer>
 </div>
+@section scripts {
+    @RenderSection("scripts", required: false)
+}

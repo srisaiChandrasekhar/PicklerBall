@@ -10,8 +10,7 @@ namespace Picklr.Models
         public DbSet<PicklProgram> Programs { get; set; } = null!;
         public DbSet<AppUser> Users { get; set; } = null!;
         public DbSet<Reservation> Reservations { get; set; } = null!;
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 

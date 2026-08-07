@@ -13,7 +13,7 @@ namespace Picklr.Controllers
             _context = context;
         }
 
-        // GET: Cart/Reserve/5?date=2026-07-15  — add program to session cart
+        // GET: Cart/Reserve/5?date=2026-07-15 - add program to session cart
         public IActionResult Reserve(int id, DateTime? date)
         {
             var program = _context.Programs
@@ -40,15 +40,17 @@ namespace Picklr.Controllers
                     ReservationDate = reservationDate
                 });
                 PicklrSession.SetCart(HttpContext.Session, cart);
-                TempData["message"] = $"{program.Name} on {reservationDate:MMM d} added to your cart.";
+                TempData["message"] = program.Name + " on " +
+                    reservationDate.ToString("MMM d") + " added to your cart.";
             }
             else
             {
-                TempData["message"] = $"{program.Name} on {reservationDate:MMM d} is already in your cart.";
+                TempData["message"] = program.Name + " on " +
+                    reservationDate.ToString("MMM d") + " is already in your cart.";
             }
 
             // Pass current filter values back as route data so HomeController.Index()
-            // receives and re-saves them — mirrors the NFLTeams FavoritesController pattern.
+            // receives and re-saves them - mirrors the NFLTeams FavoritesController pattern.
             return RedirectToAction("Index", "Home", new {
                 clubId = PicklrSession.GetFilterClubId(HttpContext.Session),
                 date   = PicklrSession.GetFilterDate(HttpContext.Session)?.ToString("yyyy-MM-dd")
@@ -62,7 +64,7 @@ namespace Picklr.Controllers
             return View(cart);
         }
 
-        // GET: Cart/Cancel/5  — remove one item from cart
+        // GET: Cart/Cancel/5 - remove one item from cart
         public IActionResult Cancel(int id)
         {
             var cart = PicklrSession.GetCart(HttpContext.Session);
@@ -71,12 +73,12 @@ namespace Picklr.Controllers
             {
                 cart.Remove(item);
                 PicklrSession.SetCart(HttpContext.Session, cart);
-                TempData["message"] = $"{item.ProgramName} removed from your cart.";
+                TempData["message"] = item.ProgramName + " removed from your cart.";
             }
             return RedirectToAction("Index");
         }
 
-        // GET: Cart/ClearAll — empty the cart
+        // GET: Cart/ClearAll - empty the cart
         public IActionResult ClearAll()
         {
             PicklrSession.ClearCart(HttpContext.Session);
@@ -84,9 +86,8 @@ namespace Picklr.Controllers
             return RedirectToAction("Index");
         }
 
-        // POST: Cart/Pay — save all reservations to DB, then clear cart
-        [HttpPost]
-        public IActionResult Pay()
+        // GET: Cart/Checkout - show the checkout form
+        public IActionResult Checkout()
         {
             var cart = PicklrSession.GetCart(HttpContext.Session);
 
@@ -96,25 +97,69 @@ namespace Picklr.Controllers
                 return RedirectToAction("Index");
             }
 
+            return View(new Checkout());
+        }
+
+        // POST: Cart/Checkout - validate the form, then save the reservations
+        [HttpPost]
+        public IActionResult Checkout(Checkout checkout)
+        {
+            var cart = PicklrSession.GetCart(HttpContext.Session);
+
+            if (!cart.Any())
+            {
+                TempData["message"] = "Your cart is empty.";
+                return RedirectToAction("Index");
+            }
+
+            // Server-side copy of the remote check, so the rule still holds
+            // when JavaScript is turned off in the browser
+            if (!string.IsNullOrEmpty(checkout.Email) && !IsRegisteredEmail(checkout.Email))
+            {
+                ModelState.AddModelError("Email",
+                    "No Picklr account is registered with that email.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(checkout);
+            }
+
             foreach (var item in cart)
             {
                 _context.Reservations.Add(new Reservation
                 {
                     ProgramID = item.ProgramID,
-                    UserName = "Guest",
+                    UserName = checkout.UserName,
                     Date = item.ReservationDate
                 });
             }
 
             _context.SaveChanges();
             PicklrSession.ClearCart(HttpContext.Session);
-            TempData["message"] = $"Payment confirmed! {cart.Count} reservation(s) saved.";
+            TempData["message"] = "Thank you, " + checkout.UserName + "! " +
+                cart.Count + " reservation(s) confirmed.";
 
-            // Restore filter context after payment — same NFLTeams redirect pattern.
+            // Restore filter context after checkout - same NFLTeams redirect pattern.
             return RedirectToAction("Index", "Home", new {
                 clubId = PicklrSession.GetFilterClubId(HttpContext.Session),
                 date   = PicklrSession.GetFilterDate(HttpContext.Session)?.ToString("yyyy-MM-dd")
             });
+        }
+
+        // Remote validation endpoint - called by the browser as the user types
+        public JsonResult CheckEmail(string email)
+        {
+            if (IsRegisteredEmail(email))
+            {
+                return Json(true);
+            }
+            return Json("No Picklr account is registered with that email.");
+        }
+
+        private bool IsRegisteredEmail(string email)
+        {
+            return _context.Users.Any(u => u.Email == email);
         }
     }
 }
