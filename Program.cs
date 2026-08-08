@@ -14,6 +14,13 @@ builder.Services.AddDbContext<PicklrContext>(options =>
 
 var app = builder.Build();
 
+// Auto-run migrations on startup so Azure gets the schema and seed data
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<PicklrContext>();
+    db.Database.Migrate();
+}
+
 // Configure HTTP pipeline
 if (!app.Environment.IsDevelopment())
 {
