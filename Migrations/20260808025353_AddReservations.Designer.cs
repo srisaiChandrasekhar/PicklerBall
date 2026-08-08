@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Picklr.Models;
 
@@ -10,9 +11,11 @@ using Picklr.Models;
 namespace Picklr.Migrations
 {
     [DbContext(typeof(PicklrContext))]
-    partial class PicklrContextModelSnapshot : ModelSnapshot
+    [Migration("20260808025353_AddReservations")]
+    partial class AddReservations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
